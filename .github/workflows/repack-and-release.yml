@@ -4,7 +4,7 @@ on:
   repository_dispatch:
   push:
     paths:
-      - '__binaries**'
+      - '__binaries/Debug**'
 
 #  schedule: 
 #   - cron: "0 15 * * 5,2"
@@ -15,7 +15,7 @@ jobs:
 
 
     - name: checkout code for release
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Install dependencies
       run: |
