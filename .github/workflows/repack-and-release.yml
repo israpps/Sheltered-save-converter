@@ -4,8 +4,8 @@ on:
   repository_dispatch:
   push:
     paths:
-      - '__binaries**'
-
+      - '__binaries/Debug**'
+      - '**.yml'
 #  schedule: 
 #   - cron: "0 15 * * 5,2"
 jobs:
@@ -15,7 +15,7 @@ jobs:
 
 
     - name: checkout code for release
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Install dependencies
       run: |
@@ -50,7 +50,7 @@ jobs:
       with:
         name: SSFC
         path: |
-             SSFC*.7z
+             __binaries/SSFC*.7z
 
 
     - name: Deploy tagged release
@@ -62,4 +62,4 @@ jobs:
         automatic_release_tag: ${{ steps.tag.outputs.version_tag }}
         title: "${{ steps.version.outputs.string }}"
         files: |
-            SSFC*.7z
+            __binaries/SSFC*.7z
