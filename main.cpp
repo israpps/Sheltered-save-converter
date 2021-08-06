@@ -2,7 +2,7 @@
  * Name:      Sheltered save file converter
  * Purpose:   decrypt/encrypt sheltered save files
  * Author:    matias israelson (aka: El_isra) (israelson-matias@hotmail.com)
- * Created:   2021-03-31
+ * Created:   2021-08-06
  * Copyright: matias israelson (aka: El_isra) (https://github.com/israpps)
  * License:   GPL-3.0
  **************************************************************/
