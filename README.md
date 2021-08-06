@@ -21,4 +21,4 @@ to decrypt your game save file into xml format, allowing you to edit/see the sav
 users usually want this to do some cheating (take a look at the M16 Hatch code & enable it for example)
 
 
-# [DOWNLOAD](https://github.com/israpps/Sheltered-save-converter/releases)
+# [DOWNLOAD](https://github.com/israpps/Sheltered-save-converter/releases/latest)
