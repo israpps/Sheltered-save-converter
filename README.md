@@ -1,4 +1,6 @@
-# What is Sheltered-save-converter?
+# Sheltered save converter
+
+![GitHub all releases](https://img.shields.io/github/downloads/israpps/Sheltered-save-converter/total?style=for-the-badge)
 
 Sheltered-save-converter is an open-source command-line utility written in C++ specifically designed to encrypt/decrypt [Sheltered](https://en.wikipedia.org/wiki/Sheltered_(video_game)) save files
 
