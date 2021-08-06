@@ -40,7 +40,6 @@ jobs:
         cp README.md __binaries/Debug/README.MD
         cd __binaries
         ls
-        cd ..
         DATEE=`date '+[%Y-%m-%d]'`
         mv Debug "SSFC[${{ steps.version.outputs.string }}]"
         7z a -t7z -r SSFC$DATEE-$REF.7z SSFC*/*
