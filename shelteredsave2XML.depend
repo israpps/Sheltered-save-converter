@@ -1,0 +1,35 @@
+# depslib dependency file v1.0
+1628226885 source:d:\isr\shelteredsave2xml\main.cpp
+	<iostream>
+	<fstream>
+	<vector>
+	<string>
+	<stdio.h>
+	"exename.h"
+
+1628223245 d:\isr\shelteredsave2xml\exename.h
+	<string>
+
+1628227221 source:d:\isr\shelteredsave2xml\pkg001.rc
+	"version.h"
+
+1628227104 d:\isr\shelteredsave2xml\version.h
+
+1628227221 source:d:\isr\isr_git\sheltered-save-converter\pkg001.rc
+	"version.h"
+
+1628230759 d:\isr\isr_git\sheltered-save-converter\version.h
+
+1628231120 source:d:\isr\isr_git\sheltered-save-converter\main.cpp
+	<iostream>
+	<fstream>
+	<vector>
+	<string>
+	<stdio.h>
+	<windows.h>
+	"exename.h"
+	"version.h"
+
+1628223245 d:\isr\isr_git\sheltered-save-converter\exename.h
+	<string>
+

@@ -1,0 +1,68 @@
+name: Release Sheltered save file converter
+on:
+  workflow_dispatch:
+  repository_dispatch:
+  push:
+    paths:
+      - '__binaries**'
+
+#  schedule: 
+#   - cron: "0 15 * * 5,2"
+jobs:
+
+  Repack_and_Release:
+    needs: check-binaries
+    runs-on: ubuntu-latest
+    steps:
+
+
+    - name: checkout code for release
+      uses: actions/checkout@v1
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get install p7zip
+
+
+    - name: get version from changelog
+      shell: bash
+      run: echo "::set-output name=string::$(grep -m1 '\[*\]' Changes.Log | sed 's/\[//' | sed 's/\]//' | awk '{$1=$1;print}')"
+      id: version
+      
+    - name: get version from changelog as release tag
+      shell: bash
+      run: echo "::set-output name=version_tag::$(grep -m1 '\[*\]' Changes.Log | sed 's/\[//' | sed 's/\]//' | sed -r 's/\s+//g' | sed 's/Revision/rev/' | awk '{$1=$1;print}')"
+      id: tag
+
+    - name: Repack as latest build
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+      run: |
+        SCH=${GITHUB_SHA::7}
+        REF=${{ steps.tag.outputs.version_tag }}
+        cp README.md __binaries/Debug/README.MD
+        cd __binaries
+        ls
+        cd ..
+        DATEE=`date '+[%Y-%m-%d]'`
+        mv Debug "SSFC[${{ steps.version.outputs.string }}]"
+        7z a -t7z -r SSFC$DATEE-$REF.7z SSFC*/*
+
+    - name: Upload artifacts
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: SSFC
+        path: |
+             SSFC*.7z
+
+
+    - name: Deploy tagged release
+      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
+      uses: marvinpinto/action-automatic-releases@latest
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        prerelease: false
+        automatic_release_tag: ${{ steps.tag.outputs.version_tag }}
+        title: "${{ steps.version.outputs.string }}"
+        files: |
+            SSFC*.7z
