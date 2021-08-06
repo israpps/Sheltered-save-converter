@@ -5,7 +5,7 @@ on:
   push:
     paths:
       - '__binaries/Debug**'
-
+      - '**.yml'
 #  schedule: 
 #   - cron: "0 15 * * 5,2"
 jobs:
@@ -50,7 +50,7 @@ jobs:
       with:
         name: SSFC
         path: |
-             SSFC*.7z
+             __binaries/SSFC*.7z
 
 
     - name: Deploy tagged release
@@ -62,4 +62,4 @@ jobs:
         automatic_release_tag: ${{ steps.tag.outputs.version_tag }}
         title: "${{ steps.version.outputs.string }}"
         files: |
-            SSFC*.7z
+            __binaries/SSFC*.7z
