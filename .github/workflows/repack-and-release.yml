@@ -1,65 +1,59 @@
-name: Release Sheltered save file converter
+name: CI
+
 on:
+  push:
+    branches:
+      - 'main'
+      - 'master'
+      - 'v*'
+    tags:
+      - v*
+  pull_request:
   workflow_dispatch:
   repository_dispatch:
-  push:
-    paths:
-      - '__binaries/Debug**'
-      - '**.yml'
-#  schedule: 
-#   - cron: "0 15 * * 5,2"
+    types: [run_build]
+
+
 jobs:
-  Repack_and_Release:
+  build:
+    strategy:
+     matrix:
+       toolchain: ["windows-static-x86","linux-x86"]
     runs-on: ubuntu-latest
+    container: dockcross/${{ matrix.toolchain }}:latest
     steps:
 
-
-    - name: checkout code for release
-      uses: actions/checkout@v2
-
-    - name: Install dependencies
+    - uses: actions/checkout@v2
+    - run: |
+        sudo apt-get install --assume-yes p7zip-full 
+        git fetch --prune --unshallow
+    - name: Compile project
       run: |
-        sudo apt-get install p7zip
-
-
-    - name: get version from changelog
-      shell: bash
-      run: echo "::set-output name=string::$(grep -m1 '\[*\]' Changes.Log | sed 's/\[//' | sed 's/\]//' | awk '{$1=$1;print}')"
-      id: version
-      
-    - name: get version from changelog as release tag
-      shell: bash
-      run: echo "::set-output name=version_tag::$(grep -m1 '\[*\]' Changes.Log | sed 's/\[//' | sed 's/\]//' | sed -r 's/\s+//g' | sed 's/Revision/rev/' | awk '{$1=$1;print}')"
-      id: tag
-
-    - name: Repack as latest build
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-      run: |
-        SCH=${GITHUB_SHA::7}
-        REF=${{ steps.tag.outputs.version_tag }}
-        cp README.md __binaries/Debug/README.MD
-        cd __binaries
-        ls
         DATEE=`date '+[%Y-%m-%d]'`
-        mv Debug "SSFC[${{ steps.version.outputs.string }}]"
-        7z a -t7z -r SSFC$DATEE-$REF.7z SSFC*/*
-
+        mv LICENCE LICENCE.TXT
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        make clean all
+        7z a -t7z ${{ github.event.repository.name }}-${{ matrix.toolchain }}.7z ../Changes.Log ../LICENCE.TXT ../README.md "${{ github.event.repository.name }}*"
+        ls -r
+        
     - name: Upload artifacts
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
-        name: SSFC
+        name: ${{ github.event.repository.name }}-${{ matrix.toolchain }}
         path: |
-             __binaries/SSFC*.7z
-
-
-    - name: Deploy tagged release
-      if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main'
-      uses: marvinpinto/action-automatic-releases@latest
+             build/${{ github.event.repository.name }}-${{ matrix.toolchain }}.7z
+             
+    - name: Deploy pre-release
+      uses: softprops/action-gh-release@v1
+      if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        prerelease: false
-        automatic_release_tag: ${{ steps.tag.outputs.version_tag }}
-        title: "${{ steps.version.outputs.string }}"
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        fail_on_unmatched_files: true
         files: |
-            __binaries/SSFC*.7z
+            build/${{ github.event.repository.name }}-${{ matrix.toolchain }}.7z
+        name: "Latest build"
+        tag_name: "Latest"
+        prerelease: true
