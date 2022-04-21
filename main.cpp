@@ -13,6 +13,7 @@
 
 #include <string>
 #include <stdio.h>
+#include <cstring>
 
 #ifndef NO_COLOR
 #else
