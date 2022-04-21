@@ -15,11 +15,15 @@
 #include <stdio.h>
 
 #ifndef NO_COLOR
+#else
+#endif // NO_COLOR
+
+#if defined(_WIN32) || defined(WIN32)
 #include <windows.h>
 #define COLOR(args)         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),stoi(#args,0,16));  //pass a hex value between 00 and ff (or integer equivalent)
 #else
 #define COLOR(args)
-#endif // NO_COLOR
+#endif
 
 #include "exename.h"
 #include "version.h"
