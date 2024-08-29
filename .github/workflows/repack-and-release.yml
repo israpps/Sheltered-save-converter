@@ -16,10 +16,10 @@ on:
 
 jobs:
   clean_release:
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
     - name: rebuild release body
+      if: github.ref == 'refs/heads/main'
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
