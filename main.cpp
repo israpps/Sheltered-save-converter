@@ -22,53 +22,56 @@
 #if defined(_WIN32) || defined(WIN32)
 #include <windows.h>
 #define PATHCOMP strcasecmp //windows is case insensitive!
-#define COLOR(args)    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),stoi(#args,0,16));  //pass a hex value between 00 and ff (or integer equivalent)
+#define COLOR(args)    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), std::stoi(#args,0,16))  //pass a hex value between 00 and ff (or integer equivalent)
 #else
 #define PATHCOMP strcmp
-#define COLOR(args)
+void COLOR(int arg);
 #endif
 
 uint8_t *buffer;
 std::string xor_data(uint8_t *buf, int size);
 int main(int argc, char* argv[])
 {
-    COLOR(0f)
+    std::cout;
+    COLOR(0x0f);
     printf("Sheltered SaveFile Converter - By matias Israelson (AKA:El_isra)\n");
     printf("Version [%s]\n",AutoVersion::FULLVERSION_STRING);
-    COLOR(07)
-	if(argc < 3) {
-        COLOR(0d)
+    COLOR(0x07);
+	if (argc < 3) {
+        COLOR(0x0d);
         fprintf(stderr, "Sintax errror.\n\tUsage: %s infile outfile\n",argv[0]);
-        COLOR(07)
+        COLOR(0x07);
 		return 1;
 	}
 	
-    if (!PATHCOMP(argv[1], argv[2]) {
+    if (!PATHCOMP(argv[1], argv[2])) {
         fprintf(stderr, "error: input and output are the same!\n");
-        return -1
+        return -1;
     }
-    vector<uint8_t> bytes;
+    std::vector<uint8_t> bytes;
 
-    ifstream file1(argv[1], ios_base::in | ios_base::binary);
+    std::ifstream file1(argv[1], std::ios_base::in | std::ios_base::binary);
     if (!file1.is_open()) {
-        COLOR(0C)
+        COLOR(0x0C);
         fprintf(stderr, "Could not open %s for input\n", argv[1]);
-        COLOR(07)
+        COLOR(0x07);
         return 1;
     }
-    COLOR(07)
+    COLOR(0x07);
+    uint8_t ch = file1.get();
     while (file1.good())
     {
-        bytes.push_back(file1.get());
+        bytes.push_back(ch);
+        ch = file1.get();
     }
     size_t n = bytes.size();
-    uint8_t* buff = bytes.data();
-
-    std::ofstream out(argv[2], ios_base::binary);
+    uint8_t *buff = bytes.data();
+    printf("input file size: 0x%02lx\n", n);
+    std::ofstream out(argv[2], std::ios_base::binary);
     if (!out.is_open()) {
-        COLOR(0C)
+        COLOR(0x0C);
         fprintf(stderr, "Could not open %s for output\n", argv[2]);
-        COLOR(07)
+        COLOR(0x07);
         return 1;
     }
     out << xor_data(buff, n);
@@ -77,7 +80,7 @@ int main(int argc, char* argv[])
 }
 
 
-std::string xor_data(uint8_t *buf,int size)
+std::string xor_data(uint8_t *buf, int size)
 {
     uint8_t encrypters[17] = {172, 115, 254, 242, 170, 186, 109, 171, 48, 58, 139, 167, 222, 13, 21, 33, 74};
     std::string output;
@@ -90,3 +93,27 @@ std::string xor_data(uint8_t *buf,int size)
     }
     return output;
 }
+
+
+#if defined(_WIN32) || defined(WIN32)
+#else
+void COLOR(int arg) {
+    switch (arg)
+    {
+    case 0x0F:
+        puts("\e[0;97m"); //strong white
+        break;
+    case 0x0D:
+        puts("\e[0;95m"); //strong magenta
+        break;
+    case 0x0C:
+        puts("\e[0;91m"); //strong red
+        break;
+    
+    case 0x07:
+    default:
+        puts("\e[0m");
+        break;
+    }
+}
+#endif
