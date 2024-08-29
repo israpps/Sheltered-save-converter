@@ -12,107 +12,81 @@
 #include <vector>
 
 #include <string>
+#include <stdint.h>
+#include <sys/stat.h>
 #include <stdio.h>
 #include <cstring>
 
-#ifndef NO_COLOR
-#else
-#endif // NO_COLOR
+#include "version.h"
 
 #if defined(_WIN32) || defined(WIN32)
 #include <windows.h>
-#define COLOR(args)         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),stoi(#args,0,16));  //pass a hex value between 00 and ff (or integer equivalent)
+#define PATHCOMP strcasecmp //windows is case insensitive!
+#define COLOR(args)    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),stoi(#args,0,16));  //pass a hex value between 00 and ff (or integer equivalent)
 #else
+#define PATHCOMP strcmp
 #define COLOR(args)
 #endif
 
-#include "exename.h"
-#include "version.h"
-#define DAT 0
-#define XML 1
-#define INV 99
-
-using namespace std;
-
-unsigned char magic[2] = {0x90, 0x3c};
-unsigned char *buffer;
-std::string encrypt(unsigned char *buf,int size);
-std::string arv_fnames[2];
-int sf_is;
-bool must_pause;
+uint8_t *buffer;
+std::string xor_data(uint8_t *buf, int size);
 int main(int argc, char* argv[])
 {
-    string exename = EXE_NAME(argv[0]);
     COLOR(0f)
     printf("Sheltered SaveFile Converter - By matias Israelson (AKA:El_isra)\n");
-    printf("Version [%s] - 32bits \n",AutoVersion::FULLVERSION_STRING);
+    printf("Version [%s]\n",AutoVersion::FULLVERSION_STRING);
     COLOR(07)
 	if(argc < 3) {
-		COLOR(0d)
-		printf("\tUsage: %s infile outfile\n\n",exename.c_str());
+        COLOR(0d)
+        fprintf(stderr, "Sintax errror.\n\tUsage: %s infile outfile\n",argv[0]);
         COLOR(07)
-        cin.ignore();
 		return 1;
-	} else {
-	arv_fnames[0] = EXE_NAME(argv[1]);
-	arv_fnames[1] = EXE_NAME(argv[2]);
-        if ( (argc > 3) && (strcmp(argv[3],"--nopause")==0) )
-        {
-            must_pause = false;
-        } else {
-            must_pause = true;
-        }
 	}
-
-    vector<unsigned char> bytes;
+	
+    if (!PATHCOMP(argv[1], argv[2]) {
+        fprintf(stderr, "error: input and output are the same!\n");
+        return -1
+    }
+    vector<uint8_t> bytes;
 
     ifstream file1(argv[1], ios_base::in | ios_base::binary);
-
-    unsigned char ch = file1.get();
-    COLOR(0e)
-    if (ch==magic[DAT]) {sf_is = DAT; printf("\tDecrypting save file...\n");}///if file begins with encrypted '<'
-    else if (ch==magic[XML]) {sf_is = XML; printf("\tEncrypting save file...\n");}///if files begins with '<'
-    else///if none of the conditions before passed...
-    {
-        sf_is = INV;
-        COLOR(0c)
-        printf("WARNING! [%s] can't be recognized as encrypted or decrypted save file...\n\tpress any key to continue with conversion anyway (or close window)",arv_fnames[0].c_str());
-        if (must_pause) cin.ignore();
+    if (!file1.is_open()) {
+        COLOR(0C)
+        fprintf(stderr, "Could not open %s for input\n", argv[1]);
+        COLOR(07)
+        return 1;
     }
     COLOR(07)
     while (file1.good())
     {
-        bytes.push_back(ch);
-        ch = file1.get();
+        bytes.push_back(file1.get());
     }
     size_t n = bytes.size();
-
-    unsigned char* buff = bytes.data();
-
+    uint8_t* buff = bytes.data();
 
     std::ofstream out(argv[2], ios_base::binary);
-    out << encrypt(buff,n);
-    out.close();
-
-
-    if (must_pause){
-    printf("Process completed, press any key to close program\n");
-    cin.ignore();
+    if (!out.is_open()) {
+        COLOR(0C)
+        fprintf(stderr, "Could not open %s for output\n", argv[2]);
+        COLOR(07)
+        return 1;
     }
-    return sf_is;
+    out << xor_data(buff, n);
+    out.close();
+    return 0;
 }
 
 
-std::string encrypt(unsigned char *buf,int size)
+std::string xor_data(uint8_t *buf,int size)
 {
-  unsigned char encrypters[17] = {172, 115, 254, 242, 170, 186, 109, 171, 48, 58, 139, 167, 222, 13, 21, 33, 74};
-  std::string output;
-  for( int i = 0; i < size; i++)
-  {
-      unsigned char oldValue = buf[i];
-      unsigned char encrypter = encrypters[i % 17];
-      buf[i] = oldValue ^ encrypter;
-      output += (char)buf[i];
-   }
-  return output;
+    uint8_t encrypters[17] = {172, 115, 254, 242, 170, 186, 109, 171, 48, 58, 139, 167, 222, 13, 21, 33, 74};
+    std::string output;
+    for(int i = 0; i < size; i++)
+    {
+        uint8_t oldValue = buf[i];
+        uint8_t encrypter = encrypters[i % 17];
+        buf[i] = oldValue ^ encrypter;
+        output += (uint8_t)buf[i];
+    }
+    return output;
 }
