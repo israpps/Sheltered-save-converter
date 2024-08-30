@@ -82,7 +82,12 @@ int main(int argc, char* argv[])
 
 std::string xor_data(uint8_t *buf, int size)
 {
-    uint8_t encrypters[17] = {172, 115, 254, 242, 170, 186, 109, 171, 48, 58, 139, 167, 222, 13, 21, 33, 74};
+    int a = 0xAC;
+    uint8_t encrypters[17] = {
+        0xAC, 0x73, 0xFE, 0xF2, 0xAA, 0xBA, 0x6D, 0xAB,
+        0x30, 0x3A, 0x8B, 0xA7, 0xDE, 0x0D, 0x15, 0x21,
+        0x4A
+    };
     std::string output;
     for(int i = 0; i < size; i++)
     {
