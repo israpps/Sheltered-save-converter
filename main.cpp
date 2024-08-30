@@ -27,7 +27,6 @@
 #define PATHCOMP strcmp
 void COLOR(int arg);
 #endif
-
 uint8_t *buffer;
 std::string xor_data(uint8_t *buf, int size);
 int main(int argc, char* argv[])
@@ -45,7 +44,9 @@ int main(int argc, char* argv[])
 	}
 	
     if (!PATHCOMP(argv[1], argv[2])) {
+        COLOR(0x0C);
         fprintf(stderr, "error: input and output are the same!\n");
+        COLOR(0x07);
         return -1;
     }
     std::vector<uint8_t> bytes;
