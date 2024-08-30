@@ -10,7 +10,6 @@ the usage is simple (and program will remind you if you don't enter enough argum
 ```bash
 Sheltered_save_file_converter.exe <SAVE_FILE> <CONVERTED_SAVE_FILE_NAME>
 ```
-> also, a batch file was provided for those that don't like/know how to use command line, just drag and drop your save file into the .BAT file located along the program.
 
 ## The "Encryption" of the file
 the file is just xor'ed with a 17 bytes vector back and forth
