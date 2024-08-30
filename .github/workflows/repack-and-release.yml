@@ -18,14 +18,13 @@ jobs:
   clean_release:
     runs-on: ubuntu-latest
     steps:
-    - name: delete previous tag/release
+    - name: rebuild release body
       if: github.ref == 'refs/heads/main'
-      uses: dev-drprasad/delete-tag-and-release@v0.2.0
+      uses: marvinpinto/action-automatic-releases@latest
       with:
-        delete_release: true
-        tag_name: "latest"
-      env:
-       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "Latest"
+        title: "Latest development build"
 
   build:
     needs: [clean_release]
